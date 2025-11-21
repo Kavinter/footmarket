@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Do not upload sensitive config
+src/main/resources/application.properties
