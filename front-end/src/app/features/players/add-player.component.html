@@ -1,0 +1,123 @@
+<div class="container">
+  <h2>Dodaj novog igrača</h2>
+
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <label for="name">Ime igrača:</label>
+    <input id="name" formControlName="name" />
+    <div class="error" *ngIf="fg.controls.name.touched && fg.controls.name.invalid">
+      Ime igrača je obavezno.
+    </div>
+
+    <label for="age">Godine:</label>
+    <input id="age" type="number" formControlName="age" />
+    <div class="error" *ngIf="fg.controls.age.touched && fg.controls.age.invalid">
+      Unesite godine (pozitivan broj).
+    </div>
+
+    <label for="position">Pozicija:</label>
+    <select id="position" formControlName="position">
+      <option value="">-- Izaberi poziciju --</option>
+      <option value="GK">GK</option>
+      <option value="DF">DF</option>
+      <option value="MF">MF</option>
+      <option value="FW">FW</option>
+    </select>
+    <div class="error" *ngIf="fg.controls.position.touched && fg.controls.position.invalid">
+      Pozicija je obavezna.
+    </div>
+
+    <label for="clubId">Klub:</label>
+    <select id="clubId" formControlName="clubId">
+      <option value="">-- Izaberi klub --</option>
+      <option *ngFor="let c of clubs" [value]="c.id">{{ c.name }}</option>
+    </select>
+    <div class="error" *ngIf="fg.controls.clubId.touched && fg.controls.clubId.invalid">
+      Klub je obavezan.
+    </div>
+
+    <label for="marketValue">Market Value (€):</label>
+    <input id="marketValue" type="number" formControlName="marketValue" />
+    <div class="error" *ngIf="fg.controls.marketValue.touched && fg.controls.marketValue.invalid">
+      Market value mora biti pozitivan broj.
+    </div>
+
+    <button type="submit" [disabled]="fg.invalid">Dodaj igrača</button>
+  </form>
+
+  <p class="error" *ngIf="serverError">{{ serverError }}</p>
+  <p class="ok" *ngIf="successMsg">{{ successMsg }}</p>
+
+  <p style="text-align: center; margin-top: 15px">
+    <a routerLink="/players">Nazad na pretragu igrača</a>
+  </p>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #eef2f8;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    width: 90%;
+    max-width: 500px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input,
+  select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover:enabled {
+    background-color: #155ec4;
+  }
+  .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+  }
+  .ok {
+    color: green;
+    font-size: 0.9em;
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .back {
+    text-align: center;
+    margin-top: 15px;
+  }
+</style>

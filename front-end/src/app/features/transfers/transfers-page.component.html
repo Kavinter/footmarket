@@ -1,0 +1,119 @@
+<div class="page-container">
+  <h2>Pretraga transfera</h2>
+
+  <div class="form-container">
+    <form (ngSubmit)="search()">
+      <input
+        type="text"
+        class="form-control"
+        name="playerName"
+        placeholder="Ime igrača"
+        [(ngModel)]="playerName"
+      />
+
+      <select class="form-select" name="clubId" [(ngModel)]="clubId">
+        <option [ngValue]="undefined">-- Izaberi klub --</option>
+        <option *ngFor="let c of clubs()" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+
+      <input
+        type="text"
+        class="form-control"
+        name="season"
+        placeholder="npr. 24/25"
+        [(ngModel)]="season"
+      />
+
+      <button type="submit" class="btn btn-primary">Pretraži</button>
+      <button type="button" class="btn btn-outline-secondary ms-2" (click)="reset()">Reset</button>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Igrač</th>
+        <th>Iz kluba</th>
+        <th>U klub</th>
+        <th>Cena (€)</th>
+        <th>Datum</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of transfers()">
+        <td>{{ t.playerName }}</td>
+        <td>{{ t.fromClubName }}</td>
+        <td>{{ t.toClubName }}</td>
+        <td>{{ t.transferFee | number : '1.0-0' }}</td>
+        <td>{{ t.transferDate | date : 'dd.MM.yyyy' }}</td>
+      </tr>
+      <tr *ngIf="transfers().length === 0">
+        <td colspan="5">Nema pronađenih transfera.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .page-container {
+    text-align: center;
+    margin: 30px;
+  }
+  .form-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  input.form-control,
+  select.form-select {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: calc(100% - 10px);
+  }
+  .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+  .btn-primary {
+    background: #007bff;
+    color: #fff;
+    border: none;
+  }
+  .btn-outline-secondary {
+    border: 1px solid #999;
+  }
+  table {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  th {
+    background: #007bff;
+    color: #fff;
+  }
+  .back {
+    margin-top: 16px;
+  }
+</style>

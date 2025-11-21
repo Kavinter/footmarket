@@ -1,0 +1,90 @@
+<div class="container">
+  <h2>Obriši Transfer</h2>
+
+  <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <label for="playerName">Ime igrača:</label>
+    <input
+      id="playerName"
+      type="text"
+      formControlName="playerName"
+      placeholder="Unesi ime igrača"
+    />
+    <div class="error" *ngIf="fg.controls.playerName.touched && fg.controls.playerName.invalid">
+      Ime igrača je obavezno.
+    </div>
+
+    <label for="transferDate">Datum transfera:</label>
+    <input id="transferDate" type="date" formControlName="transferDate" />
+    <div class="error" *ngIf="fg.controls.transferDate.touched && fg.controls.transferDate.invalid">
+      Datum transfera je obavezan.
+    </div>
+
+    <button type="submit" [disabled]="fg.invalid">Obriši Transfer</button>
+  </form>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .container {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  button:hover:enabled {
+    background-color: #b02a37;
+  }
+  .success {
+    color: green;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+  .error {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+  }
+  .back {
+    text-align: center;
+    margin-top: 15px;
+  }
+</style>

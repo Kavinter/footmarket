@@ -1,0 +1,135 @@
+<div class="container">
+  <h2>Registracija korisnika</h2>
+
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <label for="username">Korisničko ime</label>
+    <input id="username" type="text" formControlName="username" placeholder="min. 3 karaktera" />
+    <div class="error" *ngIf="fc.username.touched && fc.username.invalid">
+      <div *ngIf="fc.username.errors?.['required']">Korisničko ime je obavezno.</div>
+      <div *ngIf="fc.username.errors?.['minlength']">Najmanje 3 karaktera.</div>
+      <div *ngIf="fc.username.errors?.['usernameTaken']">Korisničko ime je zauzeto.</div>
+    </div>
+
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" placeholder="npr. pera@primer.com" />
+    <div class="error" *ngIf="fc.email.touched && fc.email.invalid">
+      <div *ngIf="fc.email.errors?.['required']">Email je obavezan.</div>
+      <div *ngIf="fc.email.errors?.['email']">Unesite validan email.</div>
+      <div *ngIf="fc.email.errors?.['emailTaken']">Email je već u upotrebi.</div>
+    </div>
+
+    <label for="password">Lozinka</label>
+    <input
+      id="password"
+      type="password"
+      formControlName="password"
+      placeholder="min. 6 karaktera"
+    />
+    <div class="error" *ngIf="fc.password.touched && fc.password.invalid">
+      <div *ngIf="fc.password.errors?.['required']">Lozinka je obavezna.</div>
+      <div *ngIf="fc.password.errors?.['minlength']">Najmanje 6 karaktera.</div>
+    </div>
+
+    <label for="roleId">Uloga</label>
+    <select id="roleId" formControlName="roleId">
+      <option value="">-- Izaberi ulogu --</option>
+      <option *ngFor="let r of roles()" [value]="r.id">{{ r.name }}</option>
+    </select>
+    <div class="error" *ngIf="fc.roleId.touched && fc.roleId.invalid">
+      <div *ngIf="fc.roleId.errors?.['required']">Uloga je obavezna.</div>
+    </div>
+
+    <button class="submit" [disabled]="fg.invalid || loading()">Registruj se</button>
+  </form>
+
+  <p class="ok" *ngIf="okMsg()">{{ okMsg() }}</p>
+  <p class="error" *ngIf="errMsg()">{{ errMsg() }}</p>
+
+  <p class="links">
+    <app-back-home></app-back-home>
+    <span>•</span>
+    <a routerLink="/login">Već imaš nalog? Prijava</a>
+  </p>
+</div>
+
+<style>
+  .container {
+    width: 90%;
+    max-width: 520px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin-top: 0;
+  }
+  label {
+    margin-top: 12px;
+    font-weight: 600;
+  }
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 6px;
+  }
+  .submit {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .submit[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .error {
+    color: #d00;
+    font-size: 0.9em;
+    margin-top: 4px;
+  }
+  .ok {
+    color: green;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 12px;
+  }
+  .back {
+    text-align: center;
+    margin-top: 16px;
+  }
+  a {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .links {
+    text-align: center;
+    margin-top: 16px;
+  }
+  .links a {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+  }
+  .links span {
+    margin: 0 8px;
+    color: #888;
+  }
+</style>

@@ -1,0 +1,81 @@
+<div class="container">
+  <h2>Obriši igrača</h2>
+
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <label for="name">Ime igrača:</label>
+    <input id="name" formControlName="name" />
+    <div class="error" *ngIf="fg.controls.name.touched && fg.controls.name.invalid">
+      Ime je obavezno.
+    </div>
+
+    <label for="club">Klub:</label>
+    <input id="club" formControlName="club" />
+    <div class="error" *ngIf="fg.controls.club.touched && fg.controls.club.invalid">
+      Klub je obavezan.
+    </div>
+
+    <button type="submit" [disabled]="fg.invalid">Obriši igrača</button>
+  </form>
+
+  <p class="ok" *ngIf="msg">{{ msg }}</p>
+  <p class="error" *ngIf="err">{{ err }}</p>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .container {
+    width: 90%;
+    max-width: 400px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+  }
+  label {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    width: 100%;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #e53935;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover:enabled {
+    background-color: #c62828;
+  }
+  .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+  }
+  .ok {
+    color: green;
+    text-align: center;
+    margin-top: 12px;
+  }
+  .back {
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>

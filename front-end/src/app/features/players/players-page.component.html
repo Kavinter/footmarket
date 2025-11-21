@@ -1,0 +1,167 @@
+<div class="page">
+  <h2>Pretraga igrača</h2>
+
+  <p class="msg" *ngIf="message()">{{ message() }}</p>
+  <p class="err" *ngIf="error()">{{ error() }}</p>
+
+  <form class="form" (ngSubmit)="search()">
+    <label for="name">Ime igrača:</label>
+    <input id="name" name="name" [(ngModel)]="name" />
+    <label for="club">Ime kluba:</label>
+    <input id="club" name="club" [(ngModel)]="club" />
+    <label for="position">Pozicija:</label>
+    <select id="position" name="position" [(ngModel)]="position">
+      <option value="">-- Sve pozicije --</option>
+      <option value="GK">GK</option>
+      <option value="DF">DF</option>
+      <option value="MF">MF</option>
+      <option value="FW">FW</option>
+    </select>
+    <button type="submit">Pretraži</button>
+    <button type="button" class="ghost" (click)="reset()">Reset</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Ime</th>
+        <th>Godine</th>
+        <th>Pozicija</th>
+        <th>Klub</th>
+        <th>Market Value</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of players()">
+        <td>{{ p.name }}</td>
+        <td>{{ p.age }}</td>
+        <td>{{ p.position }}</td>
+        <td>{{ p.clubName }}</td>
+        <td>{{ p.marketValue | currency : 'EUR' : 'symbol' : '1.0-0' }}</td>
+        <td>
+          <ng-container *ngIf="isManager(); else NA">
+            <button class="btn-mini" [disabled]="p.id === favoriteId()" (click)="addFavorite(p)">
+              {{ p.id === favoriteId() ? 'Već je Favorite' : 'Postavi Favorite' }}
+            </button>
+
+            <button class="watchlist-btn" [disabled]="inWatchlist(p)" (click)="addToWatchlist(p)">
+              {{ inWatchlist(p) ? 'Već na Watchlisti' : 'Dodaj na Watchlistu' }}
+            </button>
+          </ng-container>
+          <ng-template #NA>—</ng-template>
+        </td>
+      </tr>
+      <tr *ngIf="players().length === 0">
+        <td colspan="6">Nema rezultata.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .page {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin: 0 0 20px;
+  }
+  .form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .form input,
+  .form select,
+  .form button {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  .form button {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .form button:hover {
+    background: #155ec4;
+  }
+  .form .ghost {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+
+  table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  th,
+  td {
+    text-align: center;
+  }
+
+  th {
+    background: #1a73e8;
+    color: #fff;
+    padding: 10px;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  tr:hover {
+    background: #f1f1f1;
+  }
+
+  .msg {
+    color: green;
+    text-align: center;
+    font-weight: 700;
+  }
+  .err {
+    color: red;
+    text-align: center;
+    font-weight: 700;
+  }
+  .btn-mini {
+    background: #ffffff;
+    color: #333;
+    border: 1px solid #bbb;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+  }
+  .watchlist-btn {
+    background: #fff3cd;
+    color: #8a6d3b;
+    border: 1px solid #8a6d3b;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .back {
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>

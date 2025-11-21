@@ -1,0 +1,116 @@
+<div class="container">
+  <h2>Pretraga kluba za izmenu</h2>
+
+  <div class="search-block">
+    <label for="searchName">Ime kluba:</label>
+    <input id="searchName" [(ngModel)]="searchName" placeholder="Unesi ime kluba" />
+    <button type="button" (click)="search()">Pronađi</button>
+    <p class="error" *ngIf="searchError">{{ searchError }}</p>
+  </div>
+
+  <div *ngIf="loaded" class="edit-block">
+    <h3>Izmena kluba</h3>
+
+    <form [formGroup]="fg" (ngSubmit)="submit()">
+      <label for="name">Ime:</label>
+      <input id="name" formControlName="name" />
+      <div class="error" *ngIf="fg.controls.name.touched && fg.controls.name.invalid">
+        Ime kluba je obavezno.
+      </div>
+
+      <label for="country">Država:</label>
+      <input id="country" formControlName="country" />
+      <div class="error" *ngIf="fg.controls.country.touched && fg.controls.country.invalid">
+        Država je obavezna i ne sme sadržati brojeve.
+      </div>
+
+      <label for="foundedYear">Godina osnivanja:</label>
+      <input id="foundedYear" type="number" formControlName="foundedYear" />
+      <div class="error" *ngIf="fg.controls.foundedYear.touched && fg.controls.foundedYear.invalid">
+        Godina mora biti pozitivan broj.
+      </div>
+
+      <button type="submit" [disabled]="fg.invalid">Sačuvaj izmene</button>
+    </form>
+
+    <p class="ok" *ngIf="saveMsg">{{ saveMsg }}</p>
+    <p class="error" *ngIf="saveError">{{ saveError }}</p>
+  </div>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .container {
+    width: 90%;
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin-top: 0;
+  }
+  h3 {
+    text-align: center;
+    color: #1a73e8;
+    margin-top: 25px;
+  }
+  .search-block,
+  .edit-block {
+    margin-top: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+  button:hover:enabled {
+    background-color: #155ec4;
+  }
+  .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+    text-align: center;
+  }
+  .ok {
+    color: green;
+    font-size: 0.9em;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .back {
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>

@@ -1,0 +1,160 @@
+<div class="page">
+  <h2>Pretraga klubova</h2>
+
+  <form class="form" (ngSubmit)="search()">
+    <label for="country">Država:</label>
+    <input id="country" name="country" [(ngModel)]="country" />
+
+    <label for="year">Godina osnivanja:</label>
+    <input id="year" name="foundedYear" type="number" [(ngModel)]="foundedYear" />
+
+    <button type="submit">Pretraži</button>
+    <button type="button" class="ghost" (click)="reset()">Reset</button>
+  </form>
+
+  <p *ngIf="isFallback()" class="fallback">
+    Nema klubova za zadati kriterijum, prikazuju se svi klubovi.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Ime kluba</th>
+        <th>Država</th>
+        <th>Godina osnivanja</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let c of clubs()"
+        app-club-row
+        [club]="c"
+        (selectClub)="onSelectClub($event)"
+      ></tr>
+
+      <tr *ngIf="clubs().length === 0">
+        <td colspan="3">Nema rezultata.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="selectedClub() as sc" class="club-details">
+    <h3>Detalji kluba</h3>
+    <p><strong>Ime kluba:</strong> {{ sc.name }}</p>
+    <p><strong>Država:</strong> {{ sc.country }}</p>
+    <p><strong>Godina osnivanja:</strong> {{ sc.foundedYear }}</p>
+  </div>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .page {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin: 0 0 20px;
+  }
+
+  .form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .form input,
+  .form button {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .form button {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .form button:hover {
+    background: #155ec4;
+  }
+
+  .form .ghost {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+
+  .fallback {
+    color: #d00;
+    text-align: center;
+  }
+
+  table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  th,
+  td {
+    text-align: center;
+  }
+
+  th {
+    background: #1a73e8;
+    color: #fff;
+    padding: 10px;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+  }
+
+  tr:hover {
+    background: #f1f1f1;
+  }
+
+  .club-details {
+    width: 90%;
+    margin: 20px auto 0;
+    background: #fff;
+    padding: 18px 22px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .club-details h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #1a73e8;
+  }
+
+  .club-details p {
+    margin: 5px 0;
+    font-size: 15px;
+  }
+
+  .back {
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>

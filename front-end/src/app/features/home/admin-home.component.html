@@ -1,0 +1,87 @@
+<header>FootMarket - Administratorski panel</header>
+<h2>Dobrodošli, ADMIN!</h2>
+<ul>
+  <li><a routerLink="/players">Pregled igrača</a></li>
+  <li><a routerLink="/players/add">Dodaj igrača</a></li>
+  <li><a routerLink="/players/edit-search">Izmeni igrača</a></li>
+  <li><a routerLink="/players/delete">Obriši igrača</a></li>
+  <li><a routerLink="/clubs">Pregled klubova</a></li>
+  <li><a routerLink="/clubs/add">Dodaj klub</a></li>
+  <li><a routerLink="/clubs/delete">Obriši klub</a></li>
+  <li><a routerLink="/clubs/edit">Izmeni klub</a></li>
+  <li><a routerLink="/transfers">Pregled transfera</a></li>
+  <li><a routerLink="/transfers/new">Dodaj transfer</a></li>
+  <li><a routerLink="/transfers/delete">Obriši transfer</a></li>
+  <li><a routerLink="/transfers/report">Izveštaj o transferima</a></li>
+  <li><button class="logout-btn" (click)="logout()">Odjavi se</button></li>
+</ul>
+<footer>© 2025 FootMarket</footer>
+
+<style>
+  header {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 15px 30px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  body,
+  :host {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f1f5f9;
+    display: block;
+    min-height: 100vh;
+  }
+  h2 {
+    text-align: center;
+    margin: 30px 0 20px;
+    color: #1e3a8a;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  li {
+    margin: 10px 0;
+  }
+  a {
+    display: block;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+  }
+  a:hover {
+    background: #1e40af;
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1em;
+    transition: 0.2s ease-in-out;
+  }
+
+  .logout-btn:hover {
+    background: #b91c1c;
+  }
+
+  footer {
+    text-align: center;
+    margin: 40px 0;
+    color: #64748b;
+    font-size: 0.9em;
+  }
+</style>

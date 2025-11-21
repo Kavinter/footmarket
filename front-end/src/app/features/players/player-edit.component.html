@@ -1,0 +1,128 @@
+<div class="container" *ngIf="loaded; else loading">
+  <h2>Izmena igrača</h2>
+
+  <form [formGroup]="fg" (ngSubmit)="submit()">
+    <label for="name">Ime:</label>
+    <input id="name" formControlName="name" />
+    <div class="error" *ngIf="fg.controls.name.touched && fg.controls.name.invalid">
+      Ime je obavezno.
+    </div>
+
+    <label for="position">Pozicija:</label>
+    <select id="position" formControlName="position">
+      <option value="">-- Izaberi poziciju --</option>
+      <option value="GK">GK</option>
+      <option value="DF">DF</option>
+      <option value="MF">MF</option>
+      <option value="FW">FW</option>
+    </select>
+    <div class="error" *ngIf="fg.controls.position.touched && fg.controls.position.invalid">
+      Pozicija je obavezna.
+    </div>
+
+    <ng-container *ngIf="isAdmin()">
+      <label for="clubId">Klub:</label>
+      <select id="clubId" formControlName="clubId">
+        <option [ngValue]="null">-- Izaberi klub --</option>
+        <option *ngFor="let c of clubs" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+      <div class="error" *ngIf="fg.controls.clubId.touched && fg.controls.clubId.invalid">
+        Klub je obavezan.
+      </div>
+
+      <label for="age">godine:</label>
+      <input id="age" type="number" formControlName="age" />
+      <div class="error" *ngIf="fg.controls.age.touched && fg.controls.age.invalid">
+        Godine moraju biti između 15 i 50.
+      </div>
+
+      <label for="marketValue">Market Value (€):</label>
+      <input id="marketValue" type="number" formControlName="marketValue" />
+      <div class="error" *ngIf="fg.controls.marketValue.touched && fg.controls.marketValue.invalid">
+        Market value mora biti ≥ 0.
+      </div>
+    </ng-container>
+
+    <button type="submit" [disabled]="fg.invalid">Sačuvaj izmene</button>
+  </form>
+
+  <p class="ok" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="error" *ngIf="serverError">{{ serverError }}</p>
+
+  <p style="text-align: center; margin-top: 15px">
+    <a routerLink="/players">Nazad na listu igrača</a>
+  </p>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="container">
+    <p>Učitavanje igrača...</p>
+  </div>
+</ng-template>
+
+<style>
+  .container {
+    width: 90%;
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin-bottom: 16px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input,
+  select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #1a73e8;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover:enabled {
+    background-color: #155ec4;
+  }
+  .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+  }
+  .ok {
+    color: green;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .back {
+    text-align: center;
+    margin-top: 15px;
+  }
+</style>

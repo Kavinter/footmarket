@@ -1,0 +1,20 @@
+<td>{{ club?.name }}</td>
+<td>{{ club?.country }}</td>
+<td>{{ club?.foundedYear }}</td>
+
+<style>
+  :host {
+    cursor: pointer;
+  }
+
+  :host(:hover) {
+    background: #f1f1f1;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+  }
+</style>

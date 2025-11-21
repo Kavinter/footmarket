@@ -1,0 +1,97 @@
+<div class="wrap">
+  <h2>Moja Watchlista</h2>
+
+  <ng-container *ngIf="isManager(); else notManager">
+    <div class="box">
+      <ng-container *ngIf="items().length > 0; else empty">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Age</th>
+              <th>Club</th>
+              <th>Market Value (€)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of items()">
+              <td>{{ it.player.name }}</td>
+              <td>{{ it.player.position }}</td>
+              <td>{{ it.player.age }}</td>
+              <td>{{ it.player.clubName || it.player.club?.name || '—' }}</td>
+              <td>{{ it.player.marketValue | currency : 'EUR' : 'symbol' : '1.0-0' }}</td>
+              <td><button class="danger" (click)="remove(it.player.id)">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+      <ng-template #empty>
+        <p>Your watchlist is currently empty.</p>
+      </ng-template>
+    </div>
+  </ng-container>
+
+  <ng-template #notManager>
+    <p>Moraš biti ulogovan kao menadžer da bi video svoju watchlistu.</p>
+  </ng-template>
+
+  <div class="back"><app-back-home></app-back-home></div>
+</div>
+
+<style>
+  .wrap {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 30px;
+    min-height: 100vh;
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 950px;
+    margin: 0 auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  th {
+    background: #007bff;
+    color: #fff;
+    font-weight: 700;
+  }
+  tr:hover td {
+    background: #f1f5fb;
+  }
+  .danger {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .danger:hover {
+    background: #b02a37;
+  }
+  .back {
+    text-align: center;
+    margin-top: 16px;
+  }
+</style>

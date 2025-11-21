@@ -1,0 +1,96 @@
+<div class="container">
+  <h2>Pronađi igrača za izmenu</h2>
+
+  <ng-container *ngIf="canEdit(); else noAccess">
+    <form [formGroup]="fg" (ngSubmit)="submit()">
+      <label for="name">Ime igrača:</label>
+      <input id="name" formControlName="name" />
+      <div class="error" *ngIf="fg.controls.name.touched && fg.controls.name.invalid">
+        Ime igrača je obavezno.
+      </div>
+
+      <label for="position">Pozicija:</label>
+      <select id="position" formControlName="position">
+        <option value="">-- Izaberi poziciju --</option>
+        <option *ngFor="let p of positions" [value]="p">{{ p }}</option>
+      </select>
+      <div class="error" *ngIf="fg.controls.position.touched && fg.controls.position.invalid">
+        Pozicija je obavezna.
+      </div>
+
+      <label for="clubId">Klub:</label>
+      <select id="clubId" formControlName="clubId">
+        <option [ngValue]="null">-- Izaberi klub --</option>
+        <option *ngFor="let c of clubs" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+      <div class="error" *ngIf="fg.controls.clubId.touched && fg.controls.clubId.invalid">
+        Klub je obavezan.
+      </div>
+
+      <button type="submit" [disabled]="fg.invalid">Pronađi</button>
+    </form>
+
+    <p class="error" *ngIf="serverError">{{ serverError }}</p>
+  </ng-container>
+
+  <ng-template #noAccess>
+    <p class="error">Samo ADMIN i MENADŽER mogu da menjaju igrače.</p>
+  </ng-template>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .container {
+    max-width: 450px;
+    margin: 60px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin-bottom: 16px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  label {
+    font-weight: bold;
+  }
+  input,
+  select,
+  button {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  button {
+    margin-top: 10px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover:enabled {
+    background-color: #155ec4;
+  }
+  .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+    text-align: center;
+  }
+  .back {
+    text-align: center;
+    margin-top: 15px;
+  }
+</style>

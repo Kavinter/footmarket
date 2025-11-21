@@ -1,0 +1,106 @@
+<div class="container">
+  <h2>Moj omiljeni igrač</h2>
+
+  <ng-container *ngIf="isManager(); else notManager">
+    <p class="msg ok" *ngIf="message">{{ message }}</p>
+    <p class="msg err" *ngIf="error">{{ error }}</p>
+
+    <ng-container *ngIf="fav(); else noFav">
+      <table>
+        <thead>
+          <tr>
+            <th>Ime</th>
+            <th>Pozicija</th>
+            <th>Godine</th>
+            <th>Klub</th>
+            <th>Market Value (€)</th>
+            <th>Akcija</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ fav()?.name }}</td>
+            <td>{{ fav()?.position }}</td>
+            <td>{{ fav()?.age }}</td>
+            <td>{{ fav()?.clubName || '—' }}</td>
+            <td>{{ fav()?.marketValue | currency : 'EUR' : 'symbol' : '1.0-0' }}</td>
+            <td>
+              <button (click)="remove()" class="danger">Ukloni</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+
+    <ng-template #noFav>
+      <p>Trenutno nemate izabranog omiljenog igrača.</p>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #notManager>
+    <p>Morate biti prijavljeni kao menadžer da biste videli svog omiljenog igrača.</p>
+  </ng-template>
+
+  <div class="back"><app-back-home></app-back-home></div>
+</div>
+
+<style>
+  .container {
+    width: 90%;
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  h2 {
+    text-align: center;
+    color: #1a73e8;
+    margin: 0 0 16px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    background: #1a73e8;
+    color: #fff;
+    padding: 10px;
+  }
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+  }
+  tr:hover {
+    background: #f9f9f9;
+  }
+  .danger {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .danger:hover {
+    background: #c62828;
+  }
+  .msg {
+    text-align: center;
+    margin: 8px 0;
+    font-weight: 600;
+  }
+  .ok {
+    color: green;
+  }
+  .err {
+    color: red;
+  }
+  .back {
+    text-align: center;
+    margin-top: 16px;
+  }
+</style>

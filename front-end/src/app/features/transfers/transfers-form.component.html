@@ -1,0 +1,141 @@
+<div class="page">
+  <h2>Dodaj Novi Transfer</h2>
+
+  <div class="success" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="error center" *ngIf="serverError && !playerNameError && !dateError && !seasonError">
+    {{ serverError }}
+  </div>
+
+  <form [formGroup]="fg" (ngSubmit)="save()">
+    <label for="playerName">Igrač:</label>
+    <input id="playerName" formControlName="playerName" placeholder="Ime igrača" />
+    <div class="error" *ngIf="fg.controls.playerName.touched && fg.controls.playerName.invalid">
+      Ime igrača je obavezno.
+    </div>
+    <div class="error" *ngIf="playerNameError">{{ playerNameError }}</div>
+
+    <div id="fromClubContainer" [style.display]="showFromClub ? 'block' : 'none'">
+      <label for="fromClubName">Izlazni klub:</label>
+      <select id="fromClubName" formControlName="fromClubName">
+        <option value="">-- Izaberi klub --</option>
+        <option *ngFor="let c of clubs" [value]="c.name">{{ c.name }}</option>
+      </select>
+      <div
+        class="error"
+        *ngIf="fg.controls.fromClubName.touched && fg.controls.fromClubName.invalid"
+      >
+        Izlazni klub je obavezan za transfer u prošlosti.
+      </div>
+    </div>
+
+    <label for="toClubName">Klub (u koji prelazi):</label>
+    <select id="toClubName" formControlName="toClubName">
+      <option value="">-- Izaberi klub --</option>
+      <option *ngFor="let c of clubs" [value]="c.name">{{ c.name }}</option>
+    </select>
+    <div class="error" *ngIf="fg.controls.toClubName.touched && fg.controls.toClubName.invalid">
+      Klub u koji prelazi je obavezan.
+    </div>
+
+    <!-- Cena -->
+    <label for="transferFee">Cena transfera (€):</label>
+    <input id="transferFee" type="number" formControlName="transferFee" step="0.01" />
+    <div class="error" *ngIf="fg.controls.transferFee.touched && fg.controls.transferFee.invalid">
+      Cena mora biti veća ili jednaka 0.
+    </div>
+
+    <label for="transferDate">Datum transfera:</label>
+    <input id="transferDate" type="date" formControlName="transferDate" (change)="onDateChange()" />
+    <div class="error" *ngIf="fg.controls.transferDate.touched && fg.controls.transferDate.invalid">
+      Datum transfera je obavezan.
+    </div>
+    <div class="error" *ngIf="dateError">{{ dateError }}</div>
+
+    <label for="season">Sezona (npr. 24/25):</label>
+    <input id="season" formControlName="season" placeholder="24/25" />
+    <div class="error" *ngIf="fg.controls.season.touched && fg.controls.season.invalid">
+      Unesite sezonu u formatu 24/25.
+    </div>
+    <div class="error" *ngIf="seasonError">{{ seasonError }}</div>
+
+    <button type="submit" [disabled]="fg.invalid">Sačuvaj Transfer</button>
+  </form>
+
+  <p style="text-align: center; margin-top: 15px">
+    <a routerLink="/transfers">Nazad na listu transfera</a>
+  </p>
+
+  <div class="back">
+    <app-back-home></app-back-home>
+  </div>
+</div>
+
+<style>
+  .page {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    min-height: 100vh;
+    padding: 30px 0;
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  form {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+    margin: 0 auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin-top: 8px;
+    font-weight: 600;
+  }
+  input,
+  select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover:enabled {
+    background-color: #0056b3;
+  }
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .error.center {
+    text-align: center;
+  }
+  .success {
+    color: green;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  .back {
+    text-align: center;
+    margin-top: 15px;
+  }
+</style>
