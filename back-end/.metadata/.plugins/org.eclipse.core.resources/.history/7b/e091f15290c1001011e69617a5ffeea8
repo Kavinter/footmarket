@@ -1,0 +1,123 @@
+package com.example.demo.controllers;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.DTO.ClubDTO;
+import com.example.demo.service.ClubService;
+
+import jakarta.validation.Valid;
+import model.Club;
+
+@RestController
+@RequestMapping("/clubs")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+public class ClubController {
+
+    @Autowired
+    private ClubService clubService;
+
+    // GET /api/clubs            -> svi klubovi
+    // GET /api/clubs?country=IT -> filter po državi
+    // GET /api/clubs?foundedYear=1900 -> filter po godini
+    @GetMapping
+    public List<ClubDTO> list(
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) Integer foundedYear) {
+
+        List<Club> entities = (country != null || foundedYear != null)
+                ? clubService.searchClubs(country, foundedYear)
+                : clubService.getAllClubs();
+
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    // GET /api/clubs/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<ClubDTO> one(@PathVariable Long id) {
+        Optional<Club> opt = clubService.findById(id);
+        return opt.map(c -> ResponseEntity.ok(toDto(c)))
+                  .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // POST /api/clubs   body: ClubDTO
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody ClubDTO dto) {
+        // 1) provera da li već postoji klub sa istim imenom
+        Optional<Club> existing = clubService.findByName(dto.getName());
+        if (existing.isPresent()) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Klub sa tim imenom već postoji.");
+            return ResponseEntity.badRequest().body(err);
+        }
+
+        // 2) ako ne postoji → dodaj
+        clubService.addClub(dto);
+
+        // 3) posle ubacivanja pokušaj da ga nađeš po imenu da bi imao ID
+        Optional<Club> saved = clubService.findByName(dto.getName());
+        if (saved.isPresent()) {
+            return ResponseEntity.ok(toDto(saved.get()));
+        }
+        // fallback ako iz nekog razloga ne može da ga pronađe
+        return ResponseEntity.ok(dto);
+    }
+
+    // PUT /api/clubs/{id}   body: ClubDTO
+    @PutMapping("/{id}")
+    public ResponseEntity<ClubDTO> update(@PathVariable Long id, @Valid @RequestBody ClubDTO dto) {
+        Optional<Club> opt = clubService.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
+
+        Club c = opt.get();
+        // update polja iz DTO
+        c.setCountry(dto.getCountry());
+        c.setFoundedYear(dto.getFoundedYear());
+        // Ako dozvoljavaš i promenu imena:
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            c.setName(dto.getName());
+        }
+
+        clubService.save(c); // koristiš postojeći service.save(entity)
+
+        return ResponseEntity.ok(toDto(c));
+    }
+
+    // DELETE /api/clubs/{id}
+    // Pošto ClubService nema eksplicitno deleteById (ali ima deleteByName),
+    // uradićemo lookup i brisanje preko naziva.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        Optional<Club> opt = clubService.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
+
+        clubService.deleteByName(opt.get().getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    // (Opcioni dodatak, ako želiš DELETE po imenu)
+    // DELETE /api/clubs/by-name?name=AC%20Milan
+    @DeleteMapping("/by-name")
+    public ResponseEntity<Void> deleteByName(@RequestParam String name) {
+        boolean ok = clubService.deleteByName(name);
+        return ok ? ResponseEntity.noContent().build()
+                  : ResponseEntity.notFound().build();
+    }
+
+    // ---------- helper: entity -> DTO ----------
+    private ClubDTO toDto(Club c) {
+        ClubDTO dto = new ClubDTO();
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        dto.setCountry(c.getCountry());
+        dto.setFoundedYear(c.getFoundedYear());
+        return dto;
+    }
+}

@@ -1,0 +1,309 @@
+package com.example.demo.controllers;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.sql.DataSource;
+
+import jakarta.validation.Valid;
+import model.Club;
+import model.Player;
+import model.Transfer;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.DTO.TransferDTO;
+import com.example.demo.service.TransferService;
+import com.example.demo.service.PlayerService;
+import com.example.demo.service.ClubService;
+
+@RestController
+@RequestMapping("/transfers")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+public class TransferController {
+
+    @Autowired 
+    private TransferService transferService;
+    
+    @Autowired 
+    private PlayerService playerService;
+    
+    @Autowired 
+    private ClubService clubService;
+    
+    @Autowired
+    private DataSource dataSource;
+
+    @GetMapping
+    public List<TransferDTO> list(
+            @RequestParam(required = false) String playerName,
+            @RequestParam(required = false) Long clubId,
+            @RequestParam(required = false) String season
+    ) {
+        if ((playerName != null && !playerName.isBlank()) || clubId != null || (season != null && !season.isBlank())) {
+            return transferService.searchTransfers(
+                    (playerName != null && !playerName.isBlank()) ? playerName.trim() : null,
+                    clubId,
+                    (season != null && !season.isBlank()) ? season.trim() : null
+            ).stream().map(this::toDto).collect(Collectors.toList());
+        }
+        return transferService.getAll().stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransferDTO> one(@PathVariable Long id) {
+        Transfer t = transferService.getById(id);
+        return (t == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(toDto(t));
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody TransferDTO dto) {
+
+        if (dto.getPlayerName() == null || dto.getPlayerName().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "playerName",
+                    "message", "Ime igrača je obavezno."
+            ));
+        }
+
+        Player player = playerService.findByName(dto.getPlayerName());
+        if (player == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "playerName",
+                    "message", "Igrač sa tim imenom ne postoji u bazi."
+            ));
+        }
+
+        if (dto.getTransferDate() == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "transferDate",
+                    "message", "Datum transfera je obavezan."
+            ));
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate transferDay = dto.getTransferDate()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        if (transferDay.isEqual(today)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "transferDate",
+                    "message", "Transfer se ne može uneti za današnji dan."
+            ));
+        }
+
+        if (dto.getSeason() == null || dto.getSeason().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "season",
+                    "message", "Sezona je obavezna i mora biti u formatu 24/25."
+            ));
+        }
+
+        try {
+            String[] parts = dto.getSeason().split("/");
+            if (parts.length != 2) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "field", "season",
+                        "message", "Sezona mora biti u formatu 24/25."
+                ));
+            }
+
+            int startYear = Integer.parseInt(parts[0]) + 2000;
+            int endYear   = Integer.parseInt(parts[1]) + 2000;
+
+            LocalDate start = LocalDate.of(startYear, 8, 1);
+            LocalDate end   = LocalDate.of(endYear, 5, 30);
+
+            if (transferDay.isBefore(start) || transferDay.isAfter(end)) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "field", "season",
+                        "message", "Datum transfera mora biti između 1. avgusta " +
+                                   startYear + " i 30. maja " + endYear +
+                                   " za izabranu sezonu."
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "field", "season",
+                    "message", "Sezona mora biti u formatu 24/25."
+            ));
+        }
+
+        Transfer entity = fromDto(dto, null);
+        entity.setPlayer(player);
+        
+        if (entity.getFromClub() == null && player.getClub() != null) {
+            entity.setFromClub(player.getClub());
+        }
+
+        Transfer saved = transferService.save(entity);
+        return ResponseEntity.ok(toDto(saved));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TransferDTO> update(@PathVariable Long id, @Valid @RequestBody TransferDTO dto) {
+        Transfer existing = transferService.getById(id);
+        if (existing == null) return ResponseEntity.notFound().build();
+
+        Transfer merged = fromDto(dto, existing);
+        Transfer saved = transferService.save(merged);
+        return ResponseEntity.ok(toDto(saved));
+    }
+    
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> reportBySeason(@RequestParam String season) {
+        try {
+            if (season == null || season.isBlank()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String[] parts = season.split("/");
+            if (parts.length != 2) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            int startYear = Integer.parseInt(parts[0]) + 2000;
+            int endYear   = Integer.parseInt(parts[1]) + 2000;
+
+            LocalDate startLocal = LocalDate.of(startYear, 8, 1);
+            LocalDate endLocal   = LocalDate.of(endYear, 5, 30);
+            Date startDate = Date.valueOf(startLocal);
+            Date endDate   = Date.valueOf(endLocal);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("season", season);
+            params.put("startDate", startDate);
+            params.put("endDate", endDate);
+
+            try (java.io.InputStream jrxml = getClass().getResourceAsStream("/reports/TransfersBySeason.jrxml")) {
+                if (jrxml == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+
+                JasperReport jasperReport = JasperCompileManager.compileReport(jrxml);
+
+                try (Connection conn = dataSource.getConnection()) {
+                    JasperPrint print = JasperFillManager.fillReport(jasperReport, params, conn);
+
+                    byte[] pdfBytes = JasperExportManager.exportReportToPdf(print);
+
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_PDF);
+                    headers.set(HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=transfers-" + season.replace("/", "_") + ".pdf");
+
+                    return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Transfer t = transferService.getById(id);
+        if (t == null) return ResponseEntity.notFound().build();
+        transferService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/by-player-and-date")
+    public ResponseEntity<Void> deleteByPlayerAndDate(@RequestParam String playerName,
+                                                      @RequestParam String date) {
+        try {
+            java.util.Date d = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            boolean ok = transferService.deleteByPlayerNameAndDate(playerName, d);
+            return ok ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    
+
+
+    private TransferDTO toDto(Transfer t) {
+        TransferDTO dto = new TransferDTO();
+        dto.setPlayerName(t.getPlayer() != null ? t.getPlayer().getName() : null);
+        dto.setFromClubName(t.getFromClub() != null ? t.getFromClub().getName() : null);
+        dto.setToClubName(t.getToClub() != null ? t.getToClub().getName() : null);
+        dto.setTransferDate(t.getTransferDate());
+        dto.setTransferFee(t.getTransferFee());
+        dto.setSeason(computeSeasonFromDate(t.getTransferDate()));
+        return dto;
+    }
+
+    private Transfer fromDto(TransferDTO dto, Transfer target) {
+        Transfer t = (target != null) ? target : new Transfer();
+
+        if (dto.getPlayerName() != null && !dto.getPlayerName().isBlank()) {
+            Player p = playerService.findByName(dto.getPlayerName()); // prilagodi ako se metoda drugačije zove
+            if (p != null) t.setPlayer(p);
+        }
+
+        if (dto.getFromClubName() != null && !dto.getFromClubName().isBlank()) {
+            Optional<Club> from = clubService.findByName(dto.getFromClubName()); // ako vraća Club umesto Optional, prilagodi
+            from.ifPresent(t::setFromClub);
+        }
+
+        if (dto.getToClubName() != null && !dto.getToClubName().isBlank()) {
+            Optional<Club> to = clubService.findByName(dto.getToClubName());
+            to.ifPresent(t::setToClub);
+        }
+
+        if (dto.getTransferDate() != null) t.setTransferDate(dto.getTransferDate());
+        if (dto.getTransferFee() != null) t.setTransferFee(dto.getTransferFee());
+        
+        if (t.getFromClub() == null && t.getPlayer() != null && t.getPlayer().getClub() != null) {
+            t.setFromClub(t.getPlayer().getClub());
+        }
+
+        return t;
+    }
+
+    private String computeSeasonFromDate(java.util.Date date) {
+        if (date == null) return null;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+
+        int startYear, endYear;
+        if (month >= 8) {
+            startYear = year % 100;
+            endYear = (year + 1) % 100;
+        } else if (month <= 5) {
+            startYear = (year - 1) % 100;
+            endYear = year % 100;
+        } else {
+            startYear = (year - 1) % 100;
+            endYear = year % 100;
+        }
+        return String.format("%02d/%02d", startYear, endYear);
+        }
+}

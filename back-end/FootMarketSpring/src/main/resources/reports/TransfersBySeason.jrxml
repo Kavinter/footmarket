@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN"
+        "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+    http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="TransfersBySeason" pageWidth="595" pageHeight="842" columnWidth="555"
+    leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+    whenNoDataType="AllSectionsNoDetail">
+
+    <!-- Parametri -->
+    <parameter name="season" class="java.lang.String"/>
+    <parameter name="startDate" class="java.sql.Date"/>
+    <parameter name="endDate" class="java.sql.Date"/>
+
+    <!-- SQL upit -->
+    <queryString>
+        <![CDATA[
+            SELECT 
+                p.name AS playerName, 
+                fc.name AS fromClub, 
+                tc.name AS toClub,
+                t.transfer_fee AS fee, 
+                t.transfer_date AS transferDate
+            FROM transfers t
+            JOIN players p ON t.player_id = p.id
+            LEFT JOIN clubs fc ON t.from_club_id = fc.id
+            LEFT JOIN clubs tc ON t.to_club_id = tc.id
+            WHERE t.transfer_date BETWEEN $P{startDate} AND $P{endDate}
+            ORDER BY t.transfer_date DESC
+        ]]>
+    </queryString>
+
+    <!-- Polja -->
+    <field name="playerName" class="java.lang.String"/>
+    <field name="fromClub" class="java.lang.String"/>
+    <field name="toClub" class="java.lang.String"/>
+    <field name="fee" class="java.math.BigDecimal"/>
+    <field name="transferDate" class="java.sql.Date"/>
+
+    <!-- Naslov -->
+    <title>
+        <band height="60">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="60" backcolor="#1E3A8A" mode="Opaque"/>
+            </rectangle>
+            <textField>
+                <reportElement x="0" y="15" width="555" height="30" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font size="20" isBold="true" pdfFontName="Helvetica-Bold"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Izveštaj o transferima po sezoni: " + $P{season}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- Zaglavlje kolona -->
+    <columnHeader>
+        <band height="25">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="25" backcolor="#2563EB" mode="Opaque"/>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="0" y="0" width="120" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Igrač]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="120" y="0" width="100" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Iz kluba]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="220" y="0" width="100" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[U klub]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="320" y="0" width="100" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Cena (€)]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="420" y="0" width="135" height="25" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Datum]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- Red podataka -->
+    <detail>
+        <band height="20">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="20" backcolor="#F8FAFC" mode="Opaque"/>
+            </rectangle>
+
+            <textField>
+                <reportElement x="0" y="0" width="120" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{playerName}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="120" y="0" width="100" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{fromClub}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="220" y="0" width="100" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{toClub}]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="#,##0.00">
+                <reportElement x="320" y="0" width="100" height="20"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{fee}]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="dd.MM.yyyy">
+                <reportElement x="420" y="0" width="135" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{transferDate}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- Linija na kraju strane -->
+    <pageFooter>
+        <band height="20">
+            <textField>
+                <reportElement x="450" y="0" width="105" height="20"/>
+                <textElement textAlignment="Right">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Strana " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>
