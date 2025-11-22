@@ -1,5 +1,0 @@
-INDEX VERSION 1.4+C:\Users\Kavinter\Desktop\za skolu\FootMarket\back-end\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-1913893161.index
-851370735.index
-533271755.index
-2667520303.index
