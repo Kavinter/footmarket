@@ -1,7 +1,5 @@
-INDEX VERSION 1.4+C:\Users\Kavinter\Desktop\projekat ris\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-2480738025.index
-4048245321.index
-682100821.index
-505572741.index
-45525678.index
-892345297.index
+INDEX VERSION 1.4+C:\Users\Kavinter\Desktop\za skolu\FootMarket\back-end\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+1913893161.index
+851370735.index
+533271755.index
+2667520303.index

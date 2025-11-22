@@ -34,3 +34,6 @@ build/
 
 # Do not upload sensitive config
 src/main/resources/application.properties
+
+# Ignore Eclipse workspace metadata
+**/.metadata/
