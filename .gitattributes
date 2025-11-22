@@ -1,0 +1,25 @@
+# Treat TypeScript files as TypeScript (not JavaScript)
+*.ts linguist-language=TypeScript
+
+# Ignore vendor and generated files in language stats
+front-end/node_modules/* linguist-vendored
+front-end/dist/* linguist-vendored
+front-end/.angular/* linguist-vendored
+
+# Ignore production JS bundles
+front-end/*.js linguist-vendored
+front-end/src/**/*.js linguist-vendored
+
+# Ignore environment files (they shouldn't affect language stats)
+front-end/src/environments/* linguist-vendored
+
+# Ignore build and binary files on backend
+back-end/target/* linguist-vendored
+back-end/*.jar linguist-vendored
+
+# Treat JSON config files as vendored
+*.json linguist-vendored
+
+# Treat minified JS/CSS as vendored
+*.min.js linguist-vendored
+*.min.css linguist-vendored
